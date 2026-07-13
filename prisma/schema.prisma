@@ -99,6 +99,8 @@ model Store {
 
   memberships  UserStoreMembership[]
   storeRequest StoreRequest?
+  categories   Category[]
+  products     Product[]
 
   @@map("stores")
 }
@@ -177,4 +179,49 @@ model UserStoreMembership {
 
   @@unique([userId, storeId])
   @@map("user_store_memberships")
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String
+  storeId   String   @map("store_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  store     Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  products  Product[]
+
+  @@unique([storeId, slug])
+  @@map("categories")
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  imageUrls   String[] @map("image_urls")
+  categoryId  String?  @map("category_id")
+  storeId     String   @map("store_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  store     Store      @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  category  Category?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  inventory Inventory?
+
+  @@map("products")
+}
+
+model Inventory {
+  id        String   @id @default(uuid())
+  productId String   @unique @map("product_id")
+  quantity  Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("inventories")
 }
