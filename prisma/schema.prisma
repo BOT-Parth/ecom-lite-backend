@@ -1,13 +1,180 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  username  String
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  userPlatformRoles UserPlatformRole[]
+  storeMemberships  UserStoreMembership[]
+  storeRequests     StoreRequest[]
+
+  @@map("users")
+}
+
+model PlatformRole {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  userPlatformRoles       UserPlatformRole[]
+  platformRolePermissions PlatformRolePermission[]
+
+  @@map("platform_roles")
+}
+
+model PlatformPermission {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  platformRolePermissions PlatformRolePermission[]
+
+  @@map("platform_permissions")
+}
+
+model PlatformRolePermission {
+  roleId       String             @map("role_id")
+  permissionId String             @map("permission_id")
+  createdAt    DateTime           @default(now()) @map("created_at")
+  updatedAt    DateTime           @updatedAt @map("updated_at")
+  role         PlatformRole       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   PlatformPermission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("platform_role_permissions")
+}
+
+model UserPlatformRole {
+  userId    String       @map("user_id")
+  roleId    String       @map("role_id")
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      PlatformRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, roleId])
+  @@map("user_platform_roles")
+}
+
+enum StoreApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  NEEDS_CHANGES
+}
+
+enum StoreOperationalStatus {
+  OPEN
+  CLOSED
+  SUSPENDED
+}
+
+model Store {
+  id                String                 @id @default(uuid())
+  name              String
+  slug              String                 @unique
+  approvalStatus    StoreApprovalStatus    @default(PENDING) @map("approval_status")
+  operationalStatus StoreOperationalStatus @default(CLOSED) @map("operational_status")
+  createdAt         DateTime               @default(now()) @map("created_at")
+  updatedAt         DateTime               @updatedAt @map("updated_at")
+
+  memberships  UserStoreMembership[]
+  storeRequest StoreRequest?
+
+  @@map("stores")
+}
+
+enum StoreRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  NEEDS_CHANGES
+}
+
+model StoreRequest {
+  id        String             @id @default(uuid())
+  name      String
+  slug      String
+  status    StoreRequestStatus @default(PENDING)
+  userId    String             @map("user_id")
+  storeId   String?            @unique @map("store_id")
+  createdAt DateTime           @default(now()) @map("created_at")
+  updatedAt DateTime           @updatedAt @map("updated_at")
+
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  store Store? @relation(fields: [storeId], references: [id], onDelete: SetNull)
+
+  @@map("store_requests")
+}
+
+model StoreRole {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  storeRolePermissions StoreRolePermission[]
+  memberships          UserStoreMembership[]
+
+  @@map("store_roles")
+}
+
+model StorePermission {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  storeRolePermissions StoreRolePermission[]
+
+  @@map("store_permissions")
+}
+
+model StoreRolePermission {
+  roleId       String          @map("role_id")
+  permissionId String          @map("permission_id")
+  createdAt    DateTime        @default(now()) @map("created_at")
+  updatedAt    DateTime        @updatedAt @map("updated_at")
+  role         StoreRole       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   StorePermission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@map("store_role_permissions")
+}
+
+model UserStoreMembership {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  storeId   String    @map("store_id")
+  roleId    String    @map("role_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  user  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  store Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  role  StoreRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, storeId])
+  @@map("user_store_memberships")
 }
