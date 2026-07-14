@@ -1,4 +1,26 @@
+/**
+ * Layer:      Validators
+ *
+ * Purpose:
+ * Defines Zod validation schemas for category and product request bodies.
+ * These schemas are consumed by the validation middleware before any
+ * controller logic runs.
+ *
+ * Called By:
+ * src/routes/category.routes.js
+ * src/routes/product.routes.js
+ *
+ * Calls:
+ * src/constants/validation.js  (SLUG_REGEX)
+ *
+ * Request Flow:
+ * Client request body
+ *   → validation.middleware.js (applies schema)
+ *   → catalog.validator.js (schema definition)
+ */
+
 const { z } = require('zod');
+const { SLUG_REGEX, SLUG_REGEX_MESSAGE } = require('../constants/validation');
 
 const createCategorySchema = z.object({
   name: z
@@ -9,10 +31,7 @@ const createCategorySchema = z.object({
     .string({ required_error: 'Category slug is required' })
     .min(3, 'Category slug must be at least 3 characters long')
     .max(50, 'Category slug must be at most 50 characters long')
-    .regex(
-      /^[a-z0-9-]+$/,
-      'Category slug must contain only lowercase alphanumeric characters and hyphens'
-    ),
+    .regex(SLUG_REGEX, `Category slug: ${SLUG_REGEX_MESSAGE}`),
 });
 
 const updateCategorySchema = z.object({
@@ -25,10 +44,7 @@ const updateCategorySchema = z.object({
     .string()
     .min(3, 'Category slug must be at least 3 characters long')
     .max(50, 'Category slug must be at most 50 characters long')
-    .regex(
-      /^[a-z0-9-]+$/,
-      'Category slug must contain only lowercase alphanumeric characters and hyphens'
-    )
+    .regex(SLUG_REGEX, `Category slug: ${SLUG_REGEX_MESSAGE}`)
     .optional(),
 });
 

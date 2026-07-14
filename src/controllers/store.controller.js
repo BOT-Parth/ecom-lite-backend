@@ -1,3 +1,26 @@
+/**
+ * Layer:      Controllers
+ *
+ * Purpose:
+ * Receives HTTP requests for store directory endpoints (my stores, public
+ * stores), delegates to StoreService, and returns formatted responses.
+ *
+ * Called By:
+ * src/routes/store.routes.js
+ *
+ * Calls:
+ * src/services/store.service.js
+ * src/utils/response.js  (sendSuccess)
+ * src/utils/async.js     (asyncHandler)
+ *
+ * Request Flow:
+ * store.routes.js
+ *   → store.controller.js
+ *   → store.service.js
+ *   → store.repository.js
+ *   → Prisma → PostgreSQL
+ */
+
 const StoreService = require('../services/store.service');
 const { sendSuccess } = require('../utils/response');
 const asyncHandler = require('../utils/async');

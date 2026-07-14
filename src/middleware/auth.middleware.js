@@ -1,3 +1,24 @@
+/**
+ * Layer:      Middleware
+ *
+ * Purpose:
+ * Verifies the JWT Bearer token on every request that requires authentication.
+ * Extracts the userId from the token payload and attaches req.user = { userId }
+ * for downstream middleware and controllers.
+ *
+ * Called By:
+ * Any route that requires authentication (auth.routes.js, store routes, etc.)
+ *
+ * Calls:
+ * jsonwebtoken  (jwt.verify)
+ * src/utils/errors.js  (UnauthorizedError)
+ *
+ * Request Flow:
+ * Client request (Authorization: Bearer <token>)
+ *   → auth.middleware.js  (verify JWT → attach req.user)
+ *   → next middleware or controller
+ */
+
 const jwt = require('jsonwebtoken');
 const { UnauthorizedError } = require('../utils/errors');
 

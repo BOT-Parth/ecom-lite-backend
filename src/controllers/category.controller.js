@@ -1,3 +1,26 @@
+/**
+ * Layer:      Controllers
+ *
+ * Purpose:
+ * Receives HTTP requests for category endpoints (create, list, update, delete),
+ * delegates to CategoryService, and returns formatted responses.
+ *
+ * Called By:
+ * src/routes/category.routes.js
+ *
+ * Calls:
+ * src/services/category.service.js
+ * src/utils/response.js  (sendSuccess)
+ * src/utils/async.js     (asyncHandler)
+ *
+ * Request Flow:
+ * category.routes.js
+ *   → category.controller.js
+ *   → category.service.js
+ *   → category.repository.js
+ *   → Prisma → PostgreSQL
+ */
+
 const CategoryService = require('../services/category.service');
 const { sendSuccess } = require('../utils/response');
 const asyncHandler = require('../utils/async');

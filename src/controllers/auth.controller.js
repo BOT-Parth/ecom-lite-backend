@@ -1,3 +1,27 @@
+/**
+ * Layer:      Controllers
+ *
+ * Purpose:
+ * Receives HTTP requests for authentication endpoints, delegates all business
+ * logic to AuthService, and returns a formatted HTTP response.
+ * Controllers are intentionally thin — no business logic lives here.
+ *
+ * Called By:
+ * src/routes/auth.routes.js
+ *
+ * Calls:
+ * src/services/auth.service.js
+ * src/utils/response.js  (sendSuccess)
+ * src/utils/async.js     (asyncHandler)
+ *
+ * Request Flow:
+ * auth.routes.js
+ *   → auth.controller.js
+ *   → auth.service.js
+ *   → user.repository.js
+ *   → Prisma → PostgreSQL
+ */
+
 const AuthService = require('../services/auth.service');
 const { sendSuccess } = require('../utils/response');
 const asyncHandler = require('../utils/async');

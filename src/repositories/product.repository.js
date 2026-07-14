@@ -1,3 +1,23 @@
+/**
+ * Layer:      Repository
+ *
+ * Purpose:
+ * Handles all database operations for the Product model.
+ * On creation, automatically creates an associated Inventory record with
+ * quantity 0 inside a single Prisma nested write (not a separate transaction).
+ *
+ * Called By:
+ * src/services/product.service.js
+ *
+ * Calls:
+ * src/config/prisma.js  (Prisma client)
+ *
+ * Request Flow:
+ * product.service.js
+ *   → product.repository.js
+ *   → Prisma → PostgreSQL
+ */
+
 const { prisma } = require('../config/prisma');
 
 class ProductRepository {

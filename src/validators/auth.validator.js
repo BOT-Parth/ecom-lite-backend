@@ -1,3 +1,22 @@
+/**
+ * Layer:      Validators
+ *
+ * Purpose:
+ * Defines Zod validation schemas for authentication request bodies
+ * (register and login). Consumed by the validation middleware.
+ *
+ * Called By:
+ * src/routes/auth.routes.js
+ *
+ * Calls:
+ * Nothing — pure Zod schema definitions.
+ *
+ * Request Flow:
+ * Client request body
+ *   → validation.middleware.js (applies schema)
+ *   → auth.validator.js (schema definition)
+ */
+
 const { z } = require('zod');
 
 const registerSchema = z.object({

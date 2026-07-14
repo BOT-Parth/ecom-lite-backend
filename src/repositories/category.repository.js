@@ -1,3 +1,23 @@
+/**
+ * Layer:      Repository
+ *
+ * Purpose:
+ * Handles all database operations for the Category model.
+ * This is the only file that queries the category Prisma model directly.
+ *
+ * Called By:
+ * src/services/category.service.js
+ * src/services/product.service.js  (to validate categoryId belongs to store)
+ *
+ * Calls:
+ * src/config/prisma.js  (Prisma client)
+ *
+ * Request Flow:
+ * category.service.js / product.service.js
+ *   → category.repository.js
+ *   → Prisma → PostgreSQL
+ */
+
 const { prisma } = require('../config/prisma');
 
 class CategoryRepository {

@@ -1,3 +1,22 @@
+/**
+ * Layer:      Repository
+ *
+ * Purpose:
+ * Handles all database operations for the User model.
+ * This is the only file that queries the user Prisma model directly.
+ *
+ * Called By:
+ * src/services/auth.service.js
+ *
+ * Calls:
+ * src/config/prisma.js  (Prisma client)
+ *
+ * Request Flow:
+ * auth.service.js
+ *   → user.repository.js
+ *   → Prisma → PostgreSQL
+ */
+
 const { prisma } = require('../config/prisma');
 
 class UserRepository {

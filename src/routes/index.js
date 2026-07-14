@@ -1,3 +1,25 @@
+/**
+ * Layer:      Routes
+ *
+ * Purpose:
+ * Root router that mounts all feature routers onto their base paths.
+ * This is the single entry point for all API routes in the application.
+ *
+ * Called By:
+ * src/app.js  (mounted at /)
+ *
+ * Calls:
+ * src/routes/auth.routes.js
+ * src/routes/store-request.routes.js
+ * src/routes/store.routes.js
+ * src/routes/category.routes.js
+ * src/routes/product.routes.js
+ * src/routes/inventory.routes.js
+ *
+ * Request Flow:
+ * Client → app.js → routes/index.js → [feature router]
+ */
+
 const express = require('express');
 const authRoutes = require('./auth.routes');
 const storeRequestRoutes = require('./store-request.routes');

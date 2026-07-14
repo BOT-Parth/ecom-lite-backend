@@ -1,3 +1,26 @@
+/**
+ * Layer:      Controllers
+ *
+ * Purpose:
+ * Receives HTTP requests for inventory endpoints (get, update), delegates to
+ * InventoryService, and returns formatted responses.
+ *
+ * Called By:
+ * src/routes/inventory.routes.js
+ *
+ * Calls:
+ * src/services/inventory.service.js
+ * src/utils/response.js  (sendSuccess)
+ * src/utils/async.js     (asyncHandler)
+ *
+ * Request Flow:
+ * inventory.routes.js
+ *   → inventory.controller.js
+ *   → inventory.service.js
+ *   → product.service.js (ownership check) + inventory.repository.js
+ *   → Prisma → PostgreSQL
+ */
+
 const InventoryService = require('../services/inventory.service');
 const { sendSuccess } = require('../utils/response');
 const asyncHandler = require('../utils/async');

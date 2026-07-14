@@ -1,3 +1,26 @@
+/**
+ * Layer:      Controllers
+ *
+ * Purpose:
+ * Receives HTTP requests for product endpoints (create, list, getById, update,
+ * delete), delegates to ProductService, and returns formatted responses.
+ *
+ * Called By:
+ * src/routes/product.routes.js
+ *
+ * Calls:
+ * src/services/product.service.js
+ * src/utils/response.js  (sendSuccess)
+ * src/utils/async.js     (asyncHandler)
+ *
+ * Request Flow:
+ * product.routes.js
+ *   → product.controller.js
+ *   → product.service.js
+ *   → product.repository.js / category.repository.js
+ *   → Prisma → PostgreSQL
+ */
+
 const ProductService = require('../services/product.service');
 const { sendSuccess } = require('../utils/response');
 const asyncHandler = require('../utils/async');

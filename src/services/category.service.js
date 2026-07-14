@@ -1,3 +1,25 @@
+/**
+ * Layer:      Service
+ *
+ * Purpose:
+ * Owns all business logic for category operations: creation (slug uniqueness
+ * check), listing, updating (ownership + slug uniqueness check), and deletion
+ * (ownership check). All operations are scoped to a specific store.
+ *
+ * Called By:
+ * src/controllers/category.controller.js
+ *
+ * Calls:
+ * src/repositories/category.repository.js
+ * src/utils/errors.js
+ *
+ * Request Flow:
+ * category.controller.js
+ *   → category.service.js
+ *   → category.repository.js
+ *   → Prisma → PostgreSQL
+ */
+
 const CategoryRepository = require('../repositories/category.repository');
 const { ConflictError, NotFoundError } = require('../utils/errors');
 

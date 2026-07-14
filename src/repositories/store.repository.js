@@ -1,4 +1,31 @@
+/**
+ * Layer:      Repository
+ *
+ * Purpose:
+ * Handles all database operations for the Store and UserStoreMembership models.
+ * Includes the transactional store-approval workflow that atomically creates a
+ * store, updates the request status, and assigns the STORE_OWNER membership.
+ *
+ * Called By:
+ * src/services/store.service.js
+ * src/services/store-request.service.js
+ *
+ * Calls:
+ * src/config/prisma.js          (Prisma client)
+ * src/constants/store.js        (STORE_REQUEST_STATUS, STORE_OPERATIONAL_STATUS, STORE_ROLES)
+ *
+ * Request Flow:
+ * store.service.js / store-request.service.js
+ *   → store.repository.js
+ *   → Prisma ($transaction) → PostgreSQL
+ */
+
 const { prisma } = require('../config/prisma');
+const {
+  STORE_REQUEST_STATUS,
+  STORE_OPERATIONAL_STATUS,
+  STORE_ROLES,
+} = require('../constants/store');
 
 class StoreRepository {
   async findBySlug(slug) {
@@ -16,8 +43,8 @@ class StoreRepository {
   async listPublic() {
     return prisma.store.findMany({
       where: {
-        approvalStatus: 'APPROVED',
-        operationalStatus: 'OPEN',
+        approvalStatus: STORE_REQUEST_STATUS.APPROVED,
+        operationalStatus: STORE_OPERATIONAL_STATUS.OPEN,
       },
       orderBy: { name: 'asc' },
     });
@@ -45,7 +72,7 @@ class StoreRepository {
       if (!request) {
         throw new Error('Store request not found');
       }
-      if (request.status !== 'PENDING') {
+      if (request.status !== STORE_REQUEST_STATUS.PENDING) {
         throw new Error('Store request is not pending');
       }
 
@@ -62,8 +89,8 @@ class StoreRepository {
         data: {
           name: request.name,
           slug: request.slug,
-          approvalStatus: 'APPROVED',
-          operationalStatus: 'OPEN',
+          approvalStatus: STORE_REQUEST_STATUS.APPROVED,
+          operationalStatus: STORE_OPERATIONAL_STATUS.OPEN,
         },
       });
 
@@ -71,14 +98,14 @@ class StoreRepository {
       const updatedRequest = await tx.storeRequest.update({
         where: { id: requestId },
         data: {
-          status: 'APPROVED',
+          status: STORE_REQUEST_STATUS.APPROVED,
           storeId: store.id,
         },
       });
 
       // 5. Find store owner role ID
       const ownerRole = await tx.storeRole.findUnique({
-        where: { name: 'STORE_OWNER' },
+        where: { name: STORE_ROLES.STORE_OWNER },
       });
       if (!ownerRole) {
         throw new Error('STORE_OWNER store role not found in database');

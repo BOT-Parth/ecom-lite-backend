@@ -1,4 +1,24 @@
+/**
+ * Layer:      Validators
+ *
+ * Purpose:
+ * Defines the Zod validation schema for store-request creation payloads.
+ * Consumed by the validation middleware before controller logic runs.
+ *
+ * Called By:
+ * src/routes/store-request.routes.js
+ *
+ * Calls:
+ * src/constants/validation.js  (SLUG_REGEX)
+ *
+ * Request Flow:
+ * Client request body
+ *   → validation.middleware.js (applies schema)
+ *   → store-request.validator.js (schema definition)
+ */
+
 const { z } = require('zod');
+const { SLUG_REGEX, SLUG_REGEX_MESSAGE } = require('../constants/validation');
 
 const createRequestSchema = z.object({
   name: z
@@ -9,10 +29,7 @@ const createRequestSchema = z.object({
     .string({ required_error: 'Store slug is required' })
     .min(3, 'Store slug must be at least 3 characters long')
     .max(50, 'Store slug must be at most 50 characters long')
-    .regex(
-      /^[a-z0-9-]+$/,
-      'Store slug must contain only lowercase alphanumeric characters and hyphens'
-    ),
+    .regex(SLUG_REGEX, `Store slug: ${SLUG_REGEX_MESSAGE}`),
 });
 
 module.exports = {

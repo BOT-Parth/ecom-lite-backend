@@ -1,3 +1,27 @@
+/**
+ * Layer:      Service
+ *
+ * Purpose:
+ * Owns all business logic for product operations: creation (category-store
+ * ownership validation), listing (optional category filter), retrieval, update,
+ * and deletion. All operations are scoped to a specific store.
+ *
+ * Called By:
+ * src/controllers/product.controller.js
+ * src/services/inventory.service.js  (getProductById — for ownership validation)
+ *
+ * Calls:
+ * src/repositories/product.repository.js
+ * src/repositories/category.repository.js  (to validate categoryId belongs to store)
+ * src/utils/errors.js
+ *
+ * Request Flow:
+ * product.controller.js
+ *   → product.service.js
+ *   → product.repository.js
+ *   → Prisma → PostgreSQL
+ */
+
 const ProductRepository = require('../repositories/product.repository');
 const CategoryRepository = require('../repositories/category.repository');
 const { NotFoundError } = require('../utils/errors');

@@ -1,4 +1,25 @@
+/**
+ * Layer:      Repository
+ *
+ * Purpose:
+ * Handles all database operations for the StoreRequest model.
+ * This is the only file that queries the storeRequest Prisma model directly.
+ *
+ * Called By:
+ * src/services/store-request.service.js
+ *
+ * Calls:
+ * src/config/prisma.js  (Prisma client)
+ * src/constants/store.js  (STORE_REQUEST_STATUS)
+ *
+ * Request Flow:
+ * store-request.service.js
+ *   → store-request.repository.js
+ *   → Prisma → PostgreSQL
+ */
+
 const { prisma } = require('../config/prisma');
+const { STORE_REQUEST_STATUS } = require('../constants/store');
 
 class StoreRequestRepository {
   async create({ name, slug, userId }) {
@@ -7,7 +28,7 @@ class StoreRequestRepository {
         name,
         slug,
         userId,
-        status: 'PENDING',
+        status: STORE_REQUEST_STATUS.PENDING,
       },
     });
   }

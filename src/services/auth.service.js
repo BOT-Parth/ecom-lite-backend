@@ -1,3 +1,27 @@
+/**
+ * Layer:      Service
+ *
+ * Purpose:
+ * Owns all authentication business logic: user registration (password hashing,
+ * duplicate-email check), login (credential verification, JWT generation), and
+ * profile retrieval. Passwords are never returned to callers.
+ *
+ * Called By:
+ * src/controllers/auth.controller.js
+ *
+ * Calls:
+ * src/repositories/user.repository.js
+ * bcrypt   (password hashing / comparison)
+ * jsonwebtoken  (JWT signing)
+ * src/utils/errors.js
+ *
+ * Request Flow:
+ * auth.controller.js
+ *   → auth.service.js
+ *   → user.repository.js
+ *   → Prisma → PostgreSQL
+ */
+
 const UserRepository = require('../repositories/user.repository');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');

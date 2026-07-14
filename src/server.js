@@ -1,3 +1,19 @@
+/**
+ * Layer:      Server Entry Point
+ *
+ * Purpose:
+ * Starts the HTTP server and binds it to the configured port.
+ * Handles graceful shutdown on SIGTERM and SIGINT signals, closing the
+ * HTTP server and the PostgreSQL connection pool cleanly.
+ *
+ * Called By:
+ * npm start / node src/server.js  (process entry point)
+ *
+ * Calls:
+ * src/app.js              (Express application)
+ * src/config/prisma.js    (PostgreSQL pool — for shutdown)
+ */
+
 require('dotenv').config();
 const app = require('./app');
 const { pool } = require('./config/prisma');
