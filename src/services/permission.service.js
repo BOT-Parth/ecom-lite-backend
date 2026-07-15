@@ -35,6 +35,17 @@ class PermissionService {
   async hasStorePermission(userId, storeId, permissionName) {
     if (!userId || !storeId || !permissionName) return false;
 
+    // Platform permissions cannot be used to access store‑scoped resources
+    if (permissionName === 'APPROVE_STORE' || permissionName === 'CREATE_STORE') {
+      return false;
+    }
+
+    // Platform administrators bypass store-level membership permission checks
+    const isPlatformAdmin = await this.hasPlatformPermission(userId, 'APPROVE_STORE');
+    if (isPlatformAdmin) {
+      return true;
+    }
+
     const count = await PermissionRepository.countStorePermission(
       userId,
       storeId,

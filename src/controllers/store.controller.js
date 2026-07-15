@@ -3,7 +3,8 @@
  *
  * Purpose:
  * Receives HTTP requests for store directory endpoints (my stores, public
- * stores), delegates to StoreService, and returns formatted responses.
+ * stores, and platform-wide stores), delegates to StoreService, and returns
+ * formatted responses.
  *
  * Called By:
  * src/routes/store.routes.js
@@ -43,6 +44,43 @@ class StoreController {
       res,
       'Public stores directory retrieved successfully',
       { stores },
+      200
+    );
+  });
+
+  listPlatformStores = asyncHandler(async (req, res) => {
+    const stores = await StoreService.listPlatformStores();
+    return sendSuccess(
+      res,
+      'Platform stores directory retrieved successfully',
+      { stores },
+      200
+    );
+  });
+
+  getSettings = asyncHandler(async (req, res) => {
+    const { storeId } = req.params;
+    const settings = await StoreService.getStoreSettings(storeId);
+    return sendSuccess(
+      res,
+      'Store settings retrieved successfully',
+      { settings },
+      200
+    );
+  });
+
+  updateSettings = asyncHandler(async (req, res) => {
+    const { storeId } = req.params;
+    const { name, description, avatarUrl } = req.body;
+    const settings = await StoreService.updateStoreSettings(storeId, {
+      name,
+      description,
+      avatarUrl,
+    });
+    return sendSuccess(
+      res,
+      'Store settings updated successfully',
+      { settings },
       200
     );
   });

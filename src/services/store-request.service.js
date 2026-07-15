@@ -33,18 +33,18 @@ const {
 const { STORE_REQUEST_STATUS } = require('../constants/store');
 
 class StoreRequestService {
-  async createRequest({ name, slug, userId }) {
+  async createRequest({ name, slug, userId, description, avatarUrl }) {
     // Check if an approved store already uses this slug
     const existingStore = await StoreRepository.findBySlug(slug);
     if (existingStore) {
       throw new ConflictError('A store with this slug already exists');
     }
 
-    return StoreRequestRepository.create({ name, slug, userId });
+    return StoreRequestRepository.create({ name, slug, userId, description, avatarUrl });
   }
 
   async listRequests() {
-    return StoreRequestRepository.listAll();
+    return StoreRequestRepository.listPlatformStoreRequests();
   }
 
   async approveRequest(requestId) {

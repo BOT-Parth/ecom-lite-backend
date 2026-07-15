@@ -4,7 +4,8 @@
  * Purpose:
  * Handles all database operations for the Store and UserStoreMembership models.
  * Includes the transactional store-approval workflow that atomically creates a
- * store, updates the request status, and assigns the STORE_OWNER membership.
+ * store, updates the request status, assigns the STORE_OWNER membership, and
+ * queries for listing public, user-owned, and platform-wide stores.
  *
  * Called By:
  * src/services/store.service.js
@@ -31,12 +32,73 @@ class StoreRepository {
   async findBySlug(slug) {
     return prisma.store.findUnique({
       where: { slug },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        avatarUrl: true,
+        approvalStatus: true,
+        operationalStatus: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 
   async findById(id) {
     return prisma.store.findUnique({
       where: { id },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        avatarUrl: true,
+        approvalStatus: true,
+        operationalStatus: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  async updateSettings(id, { name, description, avatarUrl }) {
+    return prisma.store.update({
+      where: { id },
+      data: {
+        name,
+        description,
+        avatarUrl,
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        avatarUrl: true,
+        approvalStatus: true,
+        operationalStatus: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  async listPlatformStores() {
+    return prisma.store.findMany({
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        avatarUrl: true,
+        approvalStatus: true,
+        operationalStatus: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
@@ -45,6 +107,17 @@ class StoreRepository {
       where: {
         approvalStatus: STORE_REQUEST_STATUS.APPROVED,
         operationalStatus: STORE_OPERATIONAL_STATUS.OPEN,
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        avatarUrl: true,
+        approvalStatus: true,
+        operationalStatus: true,
+        createdAt: true,
+        updatedAt: true,
       },
       orderBy: { name: 'asc' },
     });
@@ -59,6 +132,17 @@ class StoreRepository {
           },
         },
       },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        avatarUrl: true,
+        approvalStatus: true,
+        operationalStatus: true,
+        createdAt: true,
+        updatedAt: true,
+      },
       orderBy: { name: 'asc' },
     });
   }
@@ -68,6 +152,15 @@ class StoreRepository {
       // 1. Fetch store request
       const request = await tx.storeRequest.findUnique({
         where: { id: requestId },
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          description: true,
+          avatarUrl: true,
+          status: true,
+          userId: true,
+        },
       });
       if (!request) {
         throw new Error('Store request not found');
@@ -84,11 +177,13 @@ class StoreRepository {
         throw new Error('Store slug is already taken');
       }
 
-      // 3. Create the Store
+      // 3. Create the Store with registration details copied over
       const store = await tx.store.create({
         data: {
           name: request.name,
           slug: request.slug,
+          description: request.description,
+          avatarUrl: request.avatarUrl,
           approvalStatus: STORE_REQUEST_STATUS.APPROVED,
           operationalStatus: STORE_OPERATIONAL_STATUS.OPEN,
         },

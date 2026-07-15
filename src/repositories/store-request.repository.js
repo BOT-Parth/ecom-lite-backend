@@ -22,13 +22,27 @@ const { prisma } = require('../config/prisma');
 const { STORE_REQUEST_STATUS } = require('../constants/store');
 
 class StoreRequestRepository {
-  async create({ name, slug, userId }) {
+  async create({ name, slug, userId, description, avatarUrl }) {
     return prisma.storeRequest.create({
       data: {
         name,
         slug,
         userId,
+        description,
+        avatarUrl,
         status: STORE_REQUEST_STATUS.PENDING,
+      },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        avatarUrl: true,
+        status: true,
+        userId: true,
+        storeId: true,
+        createdAt: true,
+        updatedAt: true,
       },
     });
   }
@@ -36,11 +50,35 @@ class StoreRequestRepository {
   async findById(id) {
     return prisma.storeRequest.findUnique({
       where: { id },
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        avatarUrl: true,
+        status: true,
+        userId: true,
+        storeId: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 
-  async listAll() {
+  async listPlatformStoreRequests() {
     return prisma.storeRequest.findMany({
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        description: true,
+        avatarUrl: true,
+        status: true,
+        userId: true,
+        storeId: true,
+        createdAt: true,
+        updatedAt: true,
+      },
       orderBy: { createdAt: 'desc' },
     });
   }
@@ -49,6 +87,11 @@ class StoreRequestRepository {
     return prisma.storeRequest.update({
       where: { id },
       data: { status },
+      select: {
+        id: true,
+        status: true,
+        storeId: true,
+      },
     });
   }
 }

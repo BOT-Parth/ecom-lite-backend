@@ -3,7 +3,8 @@
  *
  * Purpose:
  * Owns business logic for store directory queries: listing the authenticated
- * user's stores and listing all publicly approved + open stores.
+ * user's stores, listing all publicly approved + open stores, and listing all
+ * stores on the platform (Platform Store Directory).
  *
  * Called By:
  * src/controllers/store.controller.js
@@ -19,6 +20,7 @@
  */
 
 const StoreRepository = require('../repositories/store.repository');
+const { NotFoundError } = require('../utils/errors');
 
 class StoreService {
   async listMyStores(userId) {
@@ -27,6 +29,30 @@ class StoreService {
 
   async listPublicStores() {
     return StoreRepository.listPublic();
+  }
+
+  async listPlatformStores() {
+    return StoreRepository.listPlatformStores();
+  }
+
+  async getStoreSettings(storeId) {
+    const store = await StoreRepository.findById(storeId);
+    if (!store) {
+      throw new NotFoundError('Store not found');
+    }
+    return {
+      name: store.name,
+      description: store.description,
+      avatarUrl: store.avatarUrl,
+    };
+  }
+
+  async updateStoreSettings(storeId, { name, description, avatarUrl }) {
+    const store = await StoreRepository.findById(storeId);
+    if (!store) {
+      throw new NotFoundError('Store not found');
+    }
+    return StoreRepository.updateSettings(storeId, { name, description, avatarUrl });
   }
 }
 

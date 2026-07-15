@@ -92,6 +92,8 @@ model Store {
   id                String                 @id @default(uuid())
   name              String
   slug              String                 @unique
+  description       String?
+  avatarUrl         String?                @map("avatar_url")
   approvalStatus    StoreApprovalStatus    @default(PENDING) @map("approval_status")
   operationalStatus StoreOperationalStatus @default(CLOSED) @map("operational_status")
   createdAt         DateTime               @default(now()) @map("created_at")
@@ -113,14 +115,16 @@ enum StoreRequestStatus {
 }
 
 model StoreRequest {
-  id        String             @id @default(uuid())
-  name      String
-  slug      String
-  status    StoreRequestStatus @default(PENDING)
-  userId    String             @map("user_id")
-  storeId   String?            @unique @map("store_id")
-  createdAt DateTime           @default(now()) @map("created_at")
-  updatedAt DateTime           @updatedAt @map("updated_at")
+  id          String             @id @default(uuid())
+  name        String
+  slug        String
+  description String?
+  avatarUrl   String?            @map("avatar_url")
+  status      StoreRequestStatus @default(PENDING)
+  userId      String             @map("user_id")
+  storeId     String?            @unique @map("store_id")
+  createdAt   DateTime           @default(now()) @map("created_at")
+  updatedAt   DateTime           @updatedAt @map("updated_at")
 
   user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   store Store? @relation(fields: [storeId], references: [id], onDelete: SetNull)

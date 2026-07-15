@@ -28,13 +28,15 @@ const asyncHandler = require('../utils/async');
 
 class StoreRequestController {
   create = asyncHandler(async (req, res) => {
-    const { name, slug } = req.body;
+    const { name, slug, description, avatarUrl } = req.body;
     const { userId } = req.user;
 
     const request = await StoreRequestService.createRequest({
       name,
       slug,
       userId,
+      description,
+      avatarUrl,
     });
 
     return sendSuccess(

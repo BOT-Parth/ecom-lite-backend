@@ -20,8 +20,8 @@
  *
  * Request Flow:
  * Route
- *   → validation.middleware.js  (schema.safeParse)
- *   → next()  (valid) or next(BadRequestError)  (invalid)
+ *    validation.middleware.js  (schema.safeParse)
+ *    next()  (valid) or next(BadRequestError)  (invalid)
  */
 
 const { BadRequestError } = require('../utils/errors');

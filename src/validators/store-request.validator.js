@@ -30,6 +30,16 @@ const createRequestSchema = z.object({
     .min(3, 'Store slug must be at least 3 characters long')
     .max(50, 'Store slug must be at most 50 characters long')
     .regex(SLUG_REGEX, `Store slug: ${SLUG_REGEX_MESSAGE}`),
+  description: z
+    .string()
+    .max(500, 'Store description must be at most 500 characters long')
+    .optional()
+    .nullable(),
+  avatarUrl: z
+    .string()
+    .max(2048, 'Store avatar reference must be at most 2048 characters long')
+    .optional()
+    .nullable(),
 });
 
 module.exports = {
