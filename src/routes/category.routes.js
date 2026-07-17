@@ -31,43 +31,43 @@
  * parent mount path is accessible in this router and its middleware.
  */
 
-const express = require('express');
-const CategoryController = require('../controllers/category.controller');
-const authenticate = require('../middleware/auth.middleware');
-const { requireStorePermission } = require('../middleware/rbac.middleware');
-const validate = require('../middleware/validation.middleware');
+const express = require("express");
+const CategoryController = require("../controllers/category.controller");
+const authenticate = require("../middleware/auth.middleware");
+const { requireStorePermission } = require("../middleware/rbac.middleware");
+const validate = require("../middleware/validation.middleware");
 const {
   createCategorySchema,
   updateCategorySchema,
-} = require('../validators/catalog.validator');
-const { STORE_PERMISSIONS } = require('../permissions/store.permissions');
+} = require("../validators/catalog.validator");
+const { STORE_PERMISSIONS } = require("../permissions/store.permissions");
 
 // mergeParams is required to access :storeId from the parent mount path
 const router = express.Router({ mergeParams: true });
 
 router.post(
-  '/',
+  "/",
   authenticate,
   requireStorePermission(STORE_PERMISSIONS.MANAGE_PRODUCTS),
   validate(createCategorySchema),
-  CategoryController.create
+  CategoryController.create,
 );
 
-router.get('/', CategoryController.list);
+router.get("/", CategoryController.list);
 
 router.patch(
-  '/:id',
+  "/:id",
   authenticate,
   requireStorePermission(STORE_PERMISSIONS.MANAGE_PRODUCTS),
   validate(updateCategorySchema),
-  CategoryController.update
+  CategoryController.update,
 );
 
 router.delete(
-  '/:id',
+  "/:id",
   authenticate,
   requireStorePermission(STORE_PERMISSIONS.MANAGE_PRODUCTS),
-  CategoryController.delete
+  CategoryController.delete,
 );
 
 module.exports = router;
