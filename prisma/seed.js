@@ -67,6 +67,7 @@ async function main() {
   const storePermissionsToSeed = [
     { name: 'MANAGE_PRODUCTS', description: 'Manage products in the store' },
     { name: 'MANAGE_STORE', description: 'Manage settings and metadata of the store' },
+    { name: 'MANAGE_ORDERS', description: 'Manage customer orders' },
   ];
 
   const storePermissions = {};
@@ -141,6 +142,36 @@ async function main() {
     create: {
       roleId: storeRoles['STORE_STAFF'].id,
       permissionId: storePermissions['MANAGE_PRODUCTS'].id,
+    },
+  });
+
+  // STORE_OWNER gets MANAGE_ORDERS
+  await prisma.storeRolePermission.upsert({
+    where: {
+      roleId_permissionId: {
+        roleId: storeRoles['STORE_OWNER'].id,
+        permissionId: storePermissions['MANAGE_ORDERS'].id,
+      },
+    },
+    update: {},
+    create: {
+      roleId: storeRoles['STORE_OWNER'].id,
+      permissionId: storePermissions['MANAGE_ORDERS'].id,
+    },
+  });
+
+  // STORE_STAFF gets MANAGE_ORDERS
+  await prisma.storeRolePermission.upsert({
+    where: {
+      roleId_permissionId: {
+        roleId: storeRoles['STORE_STAFF'].id,
+        permissionId: storePermissions['MANAGE_ORDERS'].id,
+      },
+    },
+    update: {},
+    create: {
+      roleId: storeRoles['STORE_STAFF'].id,
+      permissionId: storePermissions['MANAGE_ORDERS'].id,
     },
   });
 

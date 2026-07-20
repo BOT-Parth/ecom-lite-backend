@@ -27,6 +27,7 @@ const storeRoutes = require("./store.routes");
 const categoryRoutes = require("./category.routes");
 const productRoutes = require("./product.routes");
 const inventoryRoutes = require("./inventory.routes");
+const orderRoutes = require("./order.routes");
 
 const router = express.Router();
 
@@ -41,5 +42,6 @@ router.use("/stores", storeRoutes);
 router.use("/stores/:storeId/categories", categoryRoutes);
 router.use("/stores/:storeId/products", productRoutes);
 router.use("/stores/:storeId/products/:productId/inventory", inventoryRoutes);
+router.use("/stores/:storeId/orders", orderRoutes);
 
 module.exports = router;

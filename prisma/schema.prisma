@@ -103,6 +103,7 @@ model Store {
   storeRequest StoreRequest?
   categories   Category[]
   products     Product[]
+  orders       Order[]
 
   @@map("stores")
 }
@@ -170,12 +171,12 @@ model StoreRolePermission {
 }
 
 model UserStoreMembership {
-  id        String    @id @default(uuid())
-  userId    String    @map("user_id")
-  storeId   String    @map("store_id")
-  roleId    String    @map("role_id")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  storeId   String   @map("store_id")
+  roleId    String   @map("role_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   user  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   store Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
@@ -193,8 +194,8 @@ model Category {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  store     Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  products  Product[]
+  store    Store     @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  products Product[]
 
   @@unique([storeId, slug])
   @@map("categories")
@@ -211,9 +212,10 @@ model Product {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  store     Store      @relation(fields: [storeId], references: [id], onDelete: Cascade)
-  category  Category?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  inventory Inventory?
+  store      Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  category   Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  inventory  Inventory?
+  orderItems OrderItem[]
 
   @@map("products")
 }
@@ -225,7 +227,50 @@ model Inventory {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@map("inventories")
+}
+
+enum OrderStatus {
+  PLACED
+  PROCESSING
+  READY
+  COMPLETED
+  CANCELLED
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  orderNumber     String      @unique @map("order_number")
+  storeId         String      @map("store_id")
+  customerName    String      @map("customer_name")
+  customerEmail   String      @map("customer_email")
+  customerPhone   String      @map("customer_phone")
+  deliveryAddress String      @map("delivery_address")
+  totalAmount     Decimal     @map("total_amount") @db.Decimal(10, 2)
+  status          OrderStatus @default(PLACED)
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  store Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  items OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  orderId     String   @map("order_id")
+  productId   String?  @map("product_id")
+  productName String   @map("product_name")
+  quantity    Int
+  unitPrice   Decimal  @map("unit_price") @db.Decimal(10, 2)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  order   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@map("order_items")
 }
