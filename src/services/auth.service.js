@@ -33,7 +33,8 @@
 const UserRepository = require('../repositories/user.repository');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { ConflictError, UnauthorizedError } = require('../utils/errors');
+const { NotFoundError, UnauthorizedError, ConflictError } = require('../utils/errors');
+const env = require('../config/env');
 
 class AuthService {
   async register({ email, username, password }) {
@@ -73,8 +74,8 @@ class AuthService {
     }
 
     // Step 2 — issue JWT (userId only; authorization data is never in the token)
-    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN,
+    const token = jwt.sign({ userId: user.id }, env.JWT_SECRET, {
+      expiresIn: env.JWT_EXPIRES_IN,
     });
 
     // Step 3 — fetch enriched context after credentials are confirmed valid;

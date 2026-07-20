@@ -18,7 +18,8 @@ require('dotenv').config();
 const app = require('./app');
 const { pool } = require('./config/prisma');
 
-const PORT = process.env.PORT || 5000;
+const env = require('./config/env');
+const PORT = env.PORT;
 
 const server = app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

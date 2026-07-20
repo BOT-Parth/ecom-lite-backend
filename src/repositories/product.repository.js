@@ -19,6 +19,7 @@
  */
 
 const { prisma } = require('../config/prisma');
+const { withStoreScope } = require('./helpers');
 
 class ProductRepository {
   async create({ name, description, price, imageUrls, categoryId, storeId }) {
@@ -48,16 +49,15 @@ class ProductRepository {
   }
 
   async list(storeId, categoryId) {
-    const whereClause = { storeId };
-    if (categoryId) {
-      whereClause.categoryId = categoryId;
-    }
-
-    return prisma.product.findMany({
-      where: whereClause,
+    const query = {
       include: { category: true },
       orderBy: { name: 'asc' },
-    });
+    };
+    if (categoryId) {
+      query.where = { categoryId };
+    }
+
+    return prisma.product.findMany(withStoreScope(storeId, query));
   }
 
   async update(id, data) {

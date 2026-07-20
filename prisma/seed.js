@@ -4,10 +4,10 @@ const bcrypt = require('bcrypt');
 async function main() {
   console.log('Starting database seeding...');
 
-  // Get Super Admin credentials from environment
-  const adminEmail = process.env.SUPER_ADMIN_EMAIL;
-  const adminPassword = process.env.SUPER_ADMIN_PASSWORD;
-  const adminUsername = process.env.SUPER_ADMIN_USERNAME || 'admin';
+  const env = require('../src/config/env');
+  const adminEmail = env.SUPER_ADMIN_EMAIL;
+  const adminPassword = env.SUPER_ADMIN_PASSWORD;
+  const adminUsername = env.SUPER_ADMIN_USERNAME;
 
   if (!adminEmail || !adminPassword) {
     throw new Error(
@@ -152,7 +152,6 @@ async function main() {
   const adminUser = await prisma.user.upsert({
     where: { email: adminEmail },
     update: {
-      password: hashedPassword,
       username: adminUsername,
       isActive: true,
     },

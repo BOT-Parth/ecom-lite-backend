@@ -20,39 +20,20 @@
  */
 
 const { z } = require('zod');
-const { SLUG_REGEX, SLUG_REGEX_MESSAGE } = require('../constants/validation');
+const { shortNameSchema, nameSchema, slugSchema } = require('./fields.validator');
 
 const createCategorySchema = z.object({
-  name: z
-    .string({ required_error: 'Category name is required' })
-    .min(3, 'Category name must be at least 3 characters long')
-    .max(50, 'Category name must be at most 50 characters long'),
-  slug: z
-    .string({ required_error: 'Category slug is required' })
-    .min(3, 'Category slug must be at least 3 characters long')
-    .max(50, 'Category slug must be at most 50 characters long')
-    .regex(SLUG_REGEX, `Category slug: ${SLUG_REGEX_MESSAGE}`),
+  name: shortNameSchema('Category'),
+  slug: slugSchema('Category'),
 });
 
 const updateCategorySchema = z.object({
-  name: z
-    .string()
-    .min(3, 'Category name must be at least 3 characters long')
-    .max(50, 'Category name must be at most 50 characters long')
-    .optional(),
-  slug: z
-    .string()
-    .min(3, 'Category slug must be at least 3 characters long')
-    .max(50, 'Category slug must be at most 50 characters long')
-    .regex(SLUG_REGEX, `Category slug: ${SLUG_REGEX_MESSAGE}`)
-    .optional(),
+  name: shortNameSchema('Category').optional(),
+  slug: slugSchema('Category').optional(),
 });
 
 const createProductSchema = z.object({
-  name: z
-    .string({ required_error: 'Product name is required' })
-    .min(3, 'Product name must be at least 3 characters long')
-    .max(100, 'Product name must be at most 100 characters long'),
+  name: nameSchema('Product'),
   description: z.string().optional(),
   price: z
     .number({ required_error: 'Product price is required' })
@@ -62,11 +43,7 @@ const createProductSchema = z.object({
 });
 
 const updateProductSchema = z.object({
-  name: z
-    .string()
-    .min(3, 'Product name must be at least 3 characters long')
-    .max(100, 'Product name must be at most 100 characters long')
-    .optional(),
+  name: nameSchema('Product').optional(),
   description: z.string().optional(),
   price: z.number().positive('Product price must be a positive number').optional(),
   imageUrls: z.array(z.string().url('Invalid image URL')).optional(),

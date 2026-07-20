@@ -18,28 +18,13 @@
  */
 
 const { z } = require('zod');
-const { SLUG_REGEX, SLUG_REGEX_MESSAGE } = require('../constants/validation');
+const { nameSchema, slugSchema, descriptionSchema, avatarUrlSchema } = require('./fields.validator');
 
 const createRequestSchema = z.object({
-  name: z
-    .string({ required_error: 'Store name is required' })
-    .min(3, 'Store name must be at least 3 characters long')
-    .max(100, 'Store name must be at most 100 characters long'),
-  slug: z
-    .string({ required_error: 'Store slug is required' })
-    .min(3, 'Store slug must be at least 3 characters long')
-    .max(50, 'Store slug must be at most 50 characters long')
-    .regex(SLUG_REGEX, `Store slug: ${SLUG_REGEX_MESSAGE}`),
-  description: z
-    .string()
-    .max(500, 'Store description must be at most 500 characters long')
-    .optional()
-    .nullable(),
-  avatarUrl: z
-    .string()
-    .max(2048, 'Store avatar reference must be at most 2048 characters long')
-    .optional()
-    .nullable(),
+  name: nameSchema('Store'),
+  slug: slugSchema('Store'),
+  description: descriptionSchema('Store'),
+  avatarUrl: avatarUrlSchema('Store'),
 });
 
 module.exports = {

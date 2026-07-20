@@ -22,6 +22,8 @@
 const { prisma } = require('../config/prisma');
 
 class InventoryRepository {
+  // Note: Inventory is scoped via productId rather than storeId directly,
+  // so the flat withStoreScope helper does not apply mechanically here.
   async findByProductId(productId) {
     let inventory = await prisma.inventory.findUnique({
       where: { productId },

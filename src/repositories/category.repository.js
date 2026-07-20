@@ -19,6 +19,7 @@
  */
 
 const { prisma } = require('../config/prisma');
+const { withStoreScope } = require('./helpers');
 
 class CategoryRepository {
   async create({ name, slug, storeId }) {
@@ -33,6 +34,8 @@ class CategoryRepository {
     });
   }
 
+  // Note: Cannot use withStoreScope here because Prisma findUnique requires the where clause
+  // to exactly match the compound unique constraint (storeId_slug).
   async findBySlug(storeId, slug) {
     return prisma.category.findUnique({
       where: {
@@ -42,10 +45,11 @@ class CategoryRepository {
   }
 
   async list(storeId) {
-    return prisma.category.findMany({
-      where: { storeId },
-      orderBy: { name: 'asc' },
-    });
+    return prisma.category.findMany(
+      withStoreScope(storeId, {
+        orderBy: { name: 'asc' },
+      })
+    );
   }
 
   async update(id, data) {
