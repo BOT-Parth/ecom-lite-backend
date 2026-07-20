@@ -8,6 +8,22 @@
 
 const OrderService = require('../services/order.service');
 
+/**
+ * Best-effort masking of delivery address.
+ */
+function maskAddress(address) {
+  if (!address) return '***';
+  // Split by comma and filter out any parts containing numbers (street numbers, zip codes)
+  const safeParts = address.split(',').filter(p => !/\d/.test(p));
+  
+  if (safeParts.length > 0) {
+    // Take up to the last 2 safe parts (likely City, Region)
+    return safeParts.slice(-2).map(p => p.trim()).join(', ');
+  }
+  
+  return '***';
+}
+
 class OrderController {
   /**
    * Public: Place an order.
@@ -29,22 +45,6 @@ class OrderController {
   }
 
   /**
-   * Best-effort masking of delivery address.
-   */
-  _maskAddress(address) {
-    if (!address) return '***';
-    // Split by comma and filter out any parts containing numbers (street numbers, zip codes)
-    const safeParts = address.split(',').filter(p => !/\d/.test(p));
-    
-    if (safeParts.length > 0) {
-      // Take up to the last 2 safe parts (likely City, Region)
-      return safeParts.slice(-2).map(p => p.trim()).join(', ');
-    }
-    
-    return '***';
-  }
-
-  /**
    * Public: Track guest orders.
    */
   async trackOrders(req, res, next) {
@@ -59,7 +59,7 @@ class OrderController {
         // Strip exact address and PII
         delete oObj.customerEmail;
         delete oObj.customerPhone;
-        oObj.maskedDeliveryAddress = this._maskAddress(oObj.deliveryAddress);
+        oObj.maskedDeliveryAddress = maskAddress(oObj.deliveryAddress);
         delete oObj.deliveryAddress;
         delete oObj.customerName; // Protect customer name as well
         return oObj;

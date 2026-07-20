@@ -63,6 +63,15 @@ class StoreRepository {
     });
   }
 
+  async findOwnerMembershipByUserId(userId) {
+    return prisma.userStoreMembership.findFirst({
+      where: {
+        userId,
+        role: { name: STORE_ROLES.STORE_OWNER },
+      },
+    });
+  }
+
   async updateSettings(id, { name, description, avatarUrl }) {
     return prisma.store.update({
       where: { id },

@@ -34,7 +34,19 @@ const { STORE_REQUEST_STATUS } = require('../constants/store');
 
 class StoreRequestService {
   async createRequest({ name, slug, userId, description, avatarUrl }) {
-    // Check if an approved store already uses this slug
+    // 1. Check if user already owns a store
+    const existingOwnership = await StoreRepository.findOwnerMembershipByUserId(userId);
+    if (existingOwnership) {
+      throw new ConflictError('User already owns a store');
+    }
+
+    // 2. Check if user already has a pending or approved request
+    const existingRequest = await StoreRequestRepository.findActiveRequestByUserId(userId);
+    if (existingRequest) {
+      throw new ConflictError('User already has an active store request');
+    }
+
+    // 3. Check if an approved store already uses this slug
     const existingStore = await StoreRepository.findBySlug(slug);
     if (existingStore) {
       throw new ConflictError('A store with this slug already exists');

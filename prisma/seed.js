@@ -65,8 +65,10 @@ async function main() {
   // 4. Seed Store Permissions
   console.log('Seeding Store Permissions...');
   const storePermissionsToSeed = [
-    { name: 'MANAGE_PRODUCTS', description: 'Manage products in the store' },
     { name: 'MANAGE_STORE', description: 'Manage settings and metadata of the store' },
+    { name: 'MANAGE_PRODUCTS', description: 'Manage products in the store' },
+    { name: 'MANAGE_CATEGORIES', description: 'Manage product categories' },
+    { name: 'MANAGE_INVENTORY', description: 'Manage product inventory stock' },
     { name: 'MANAGE_ORDERS', description: 'Manage customer orders' },
   ];
 
@@ -84,8 +86,8 @@ async function main() {
   console.log('Seeding Store Roles...');
   const storeRolesToSeed = [
     { name: 'STORE_OWNER', description: 'Store Owner' },
+    { name: 'STORE_MANAGER', description: 'Store Manager' },
     { name: 'STORE_STAFF', description: 'Store Staff Member' },
-    { name: 'CUSTOMER', description: 'Store Customer' },
   ];
 
   const storeRoles = {};
@@ -100,80 +102,40 @@ async function main() {
 
   // 6. Map Store Permissions to Store Roles
   console.log('Mapping Store Permissions to Store Roles...');
-  // STORE_OWNER gets MANAGE_PRODUCTS
-  await prisma.storeRolePermission.upsert({
-    where: {
-      roleId_permissionId: {
-        roleId: storeRoles['STORE_OWNER'].id,
-        permissionId: storePermissions['MANAGE_PRODUCTS'].id,
+  // Helper to map permission to role
+  async function mapStorePermission(roleName, permissionName) {
+    await prisma.storeRolePermission.upsert({
+      where: {
+        roleId_permissionId: {
+          roleId: storeRoles[roleName].id,
+          permissionId: storePermissions[permissionName].id,
+        },
       },
-    },
-    update: {},
-    create: {
-      roleId: storeRoles['STORE_OWNER'].id,
-      permissionId: storePermissions['MANAGE_PRODUCTS'].id,
-    },
-  });
+      update: {},
+      create: {
+        roleId: storeRoles[roleName].id,
+        permissionId: storePermissions[permissionName].id,
+      },
+    });
+  }
 
-  // STORE_OWNER gets MANAGE_STORE
-  await prisma.storeRolePermission.upsert({
-    where: {
-      roleId_permissionId: {
-        roleId: storeRoles['STORE_OWNER'].id,
-        permissionId: storePermissions['MANAGE_STORE'].id,
-      },
-    },
-    update: {},
-    create: {
-      roleId: storeRoles['STORE_OWNER'].id,
-      permissionId: storePermissions['MANAGE_STORE'].id,
-    },
-  });
+  // Map permissions to STORE_OWNER
+  const ownerPermissions = ['MANAGE_STORE', 'MANAGE_PRODUCTS', 'MANAGE_CATEGORIES', 'MANAGE_INVENTORY', 'MANAGE_ORDERS'];
+  for (const perm of ownerPermissions) {
+    await mapStorePermission('STORE_OWNER', perm);
+  }
 
-  // STORE_STAFF gets MANAGE_PRODUCTS
-  await prisma.storeRolePermission.upsert({
-    where: {
-      roleId_permissionId: {
-        roleId: storeRoles['STORE_STAFF'].id,
-        permissionId: storePermissions['MANAGE_PRODUCTS'].id,
-      },
-    },
-    update: {},
-    create: {
-      roleId: storeRoles['STORE_STAFF'].id,
-      permissionId: storePermissions['MANAGE_PRODUCTS'].id,
-    },
-  });
+  // Map permissions to STORE_MANAGER
+  const managerPermissions = ['MANAGE_STORE', 'MANAGE_PRODUCTS', 'MANAGE_CATEGORIES', 'MANAGE_INVENTORY', 'MANAGE_ORDERS'];
+  for (const perm of managerPermissions) {
+    await mapStorePermission('STORE_MANAGER', perm);
+  }
 
-  // STORE_OWNER gets MANAGE_ORDERS
-  await prisma.storeRolePermission.upsert({
-    where: {
-      roleId_permissionId: {
-        roleId: storeRoles['STORE_OWNER'].id,
-        permissionId: storePermissions['MANAGE_ORDERS'].id,
-      },
-    },
-    update: {},
-    create: {
-      roleId: storeRoles['STORE_OWNER'].id,
-      permissionId: storePermissions['MANAGE_ORDERS'].id,
-    },
-  });
-
-  // STORE_STAFF gets MANAGE_ORDERS
-  await prisma.storeRolePermission.upsert({
-    where: {
-      roleId_permissionId: {
-        roleId: storeRoles['STORE_STAFF'].id,
-        permissionId: storePermissions['MANAGE_ORDERS'].id,
-      },
-    },
-    update: {},
-    create: {
-      roleId: storeRoles['STORE_STAFF'].id,
-      permissionId: storePermissions['MANAGE_ORDERS'].id,
-    },
-  });
+  // Map permissions to STORE_STAFF
+  const staffPermissions = ['MANAGE_PRODUCTS', 'MANAGE_CATEGORIES', 'MANAGE_INVENTORY', 'MANAGE_ORDERS'];
+  for (const perm of staffPermissions) {
+    await mapStorePermission('STORE_STAFF', perm);
+  }
 
   // 7. Seed Default SUPER_ADMIN User
   console.log('Seeding default SUPER_ADMIN user...');

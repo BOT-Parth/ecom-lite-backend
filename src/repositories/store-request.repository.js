@@ -65,6 +65,17 @@ class StoreRequestRepository {
     });
   }
 
+  async findActiveRequestByUserId(userId) {
+    return prisma.storeRequest.findFirst({
+      where: {
+        userId,
+        status: {
+          in: [STORE_REQUEST_STATUS.PENDING, STORE_REQUEST_STATUS.APPROVED],
+        },
+      },
+    });
+  }
+
   async listPlatformStoreRequests() {
     return prisma.storeRequest.findMany({
       select: {

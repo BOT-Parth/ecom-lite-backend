@@ -48,7 +48,7 @@ const router = express.Router({ mergeParams: true });
 router.post(
   "/",
   authenticate,
-  requireStorePermission(STORE_PERMISSIONS.MANAGE_PRODUCTS),
+  requireStorePermission(STORE_PERMISSIONS.MANAGE_CATEGORIES),
   validate(createCategorySchema),
   CategoryController.create,
 );
@@ -58,7 +58,7 @@ router.get("/", CategoryController.list);
 router.patch(
   "/:id",
   authenticate,
-  requireStorePermission(STORE_PERMISSIONS.MANAGE_PRODUCTS),
+  requireStorePermission(STORE_PERMISSIONS.MANAGE_CATEGORIES),
   validate(updateCategorySchema),
   CategoryController.update,
 );
@@ -66,7 +66,7 @@ router.patch(
 router.delete(
   "/:id",
   authenticate,
-  requireStorePermission(STORE_PERMISSIONS.MANAGE_PRODUCTS),
+  requireStorePermission(STORE_PERMISSIONS.MANAGE_CATEGORIES),
   CategoryController.delete,
 );
 

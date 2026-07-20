@@ -42,12 +42,15 @@ const { STORE_PERMISSIONS } = require('../permissions/store.permissions');
 // mergeParams is required to access :storeId and :productId from parent mount path
 const router = express.Router({ mergeParams: true });
 
-router.get('/', InventoryController.getInventory);
+router.get(
+  '/',
+  InventoryController.getInventory
+);
 
 router.patch(
   '/',
   authenticate,
-  requireStorePermission(STORE_PERMISSIONS.MANAGE_PRODUCTS),
+  requireStorePermission(STORE_PERMISSIONS.MANAGE_INVENTORY),
   validate(updateInventorySchema),
   InventoryController.updateInventory
 );
