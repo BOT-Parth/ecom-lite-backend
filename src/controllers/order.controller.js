@@ -8,21 +8,7 @@
 
 const OrderService = require('../services/order.service');
 
-/**
- * Best-effort masking of delivery address.
- */
-function maskAddress(address) {
-  if (!address) return '***';
-  // Split by comma and filter out any parts containing numbers (street numbers, zip codes)
-  const safeParts = address.split(',').filter(p => !/\d/.test(p));
-  
-  if (safeParts.length > 0) {
-    // Take up to the last 2 safe parts (likely City, Region)
-    return safeParts.slice(-2).map(p => p.trim()).join(', ');
-  }
-  
-  return '***';
-}
+
 
 class OrderController {
   /**
@@ -32,7 +18,8 @@ class OrderController {
     try {
       const { storeId } = req.params;
       const orderData = req.body;
-      const order = await OrderService.placeOrder(storeId, orderData);
+      const customerId = req.customer.id; // Injected by authenticateCustomer
+      const order = await OrderService.placeOrder(storeId, customerId, orderData);
       
       res.status(201).json({
         success: true,
@@ -45,29 +32,35 @@ class OrderController {
   }
 
   /**
-   * Public: Track guest orders.
+   * Protected: List all customer's orders (Customer).
    */
-  async trackOrders(req, res, next) {
+  async listCustomerOrders(req, res, next) {
     try {
       const { storeId } = req.params;
-      const { email, phone } = req.body;
-      const orders = await OrderService.trackOrders(storeId, email, phone);
+      const customerId = req.customer.id;
+      const orders = await OrderService.getCustomerOrders(storeId, customerId);
       
-      // Mask delivery address to protect PII
-      const sanitizedOrders = orders.map((o) => {
-        const oObj = { ...o };
-        // Strip exact address and PII
-        delete oObj.customerEmail;
-        delete oObj.customerPhone;
-        oObj.maskedDeliveryAddress = maskAddress(oObj.deliveryAddress);
-        delete oObj.deliveryAddress;
-        delete oObj.customerName; // Protect customer name as well
-        return oObj;
-      });
-
       res.status(200).json({
         success: true,
-        data: { orders: sanitizedOrders },
+        data: { orders },
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Protected: Get specific order details (Customer).
+   */
+  async getCustomerOrder(req, res, next) {
+    try {
+      const { storeId, id } = req.params;
+      const customerId = req.customer.id;
+      const order = await OrderService.getCustomerOrderDetails(storeId, customerId, id);
+      
+      res.status(200).json({
+        success: true,
+        data: { order },
       });
     } catch (error) {
       next(error);

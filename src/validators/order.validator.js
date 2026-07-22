@@ -2,11 +2,6 @@ const { z } = require('zod');
 const { emailSchema, nameSchema } = require('./fields.validator');
 
 const createOrderSchema = z.object({
-  customerName: nameSchema('Customer'),
-  customerEmail: emailSchema,
-  customerPhone: z
-    .string({ required_error: 'Customer phone is required' })
-    .min(10, 'Customer phone must be at least 10 characters long'),
   deliveryAddress: z
     .string({ required_error: 'Delivery address is required' })
     .min(1, 'Delivery address cannot be empty')
@@ -24,12 +19,7 @@ const createOrderSchema = z.object({
     .min(1, 'At least one item is required'),
 });
 
-const trackOrderSchema = z.object({
-  email: emailSchema,
-  phone: z
-    .string({ required_error: 'Phone number is required' })
-    .min(10, 'Phone number must be at least 10 characters long'),
-});
+
 
 const updateOrderStatusSchema = z.object({
   status: z.enum(['PLACED', 'PROCESSING', 'READY', 'COMPLETED', 'CANCELLED'], {
@@ -40,6 +30,5 @@ const updateOrderStatusSchema = z.object({
 
 module.exports = {
   createOrderSchema,
-  trackOrderSchema,
   updateOrderStatusSchema,
 };

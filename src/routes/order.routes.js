@@ -17,28 +17,23 @@
 const express = require('express');
 const OrderController = require('../controllers/order.controller');
 const authenticate = require('../middleware/auth.middleware');
+const authenticateCustomer = require('../middleware/customer-auth.middleware');
 const { requireStorePermission } = require('../middleware/rbac.middleware');
 const validate = require('../middleware/validation.middleware');
 const {
   createOrderSchema,
-  trackOrderSchema,
   updateOrderStatusSchema,
 } = require('../validators/order.validator');
 const { STORE_PERMISSIONS } = require('../permissions/store.permissions');
 
 const router = express.Router({ mergeParams: true });
 
-// --- PUBLIC ROUTES ---
+// --- PROTECTED ROUTES (Customer) ---
 router.post(
   '/',
+  authenticateCustomer,
   validate(createOrderSchema),
   OrderController.placeOrder
-);
-
-router.post(
-  '/track',
-  validate(trackOrderSchema),
-  OrderController.trackOrders
 );
 
 // --- PROTECTED ROUTES (Store Staff/Owner) ---

@@ -6,6 +6,7 @@ const envSchema = z.object({
   DATABASE_URL: z.string({ required_error: 'DATABASE_URL is required' }),
   DB_SSL: z.enum(['true', 'false']).default('false'),
   JWT_SECRET: z.string({ required_error: 'JWT_SECRET is required' }),
+  CUSTOMER_JWT_SECRET: z.string({ required_error: 'CUSTOMER_JWT_SECRET is required' }),
   JWT_EXPIRES_IN: z.string().default('24h'),
   SUPER_ADMIN_EMAIL: z.string().email().optional(),
   SUPER_ADMIN_PASSWORD: z.string().min(1).optional(),

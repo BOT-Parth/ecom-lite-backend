@@ -7,6 +7,8 @@
  */
 
 const OrderRepository = require('../repositories/order.repository');
+const CustomerRepository = require('../repositories/customer.repository');
+const { NotFoundError } = require('../utils/errors');
 
 class OrderService {
   /**
@@ -27,7 +29,12 @@ class OrderService {
   /**
    * Places a new order, enforcing inventory limits and locking items into a snapshot.
    */
-  async placeOrder(storeId, orderData) {
+  async placeOrder(storeId, customerId, orderData) {
+    const customer = await CustomerRepository.findById(customerId);
+    if (!customer) {
+      throw new NotFoundError('Customer not found');
+    }
+
     // 1. Merge duplicate productIds
     const mergedItems = this._mergeDuplicateItems(orderData.items);
     const productIds = mergedItems.map((item) => item.productId);
@@ -87,14 +94,37 @@ class OrderService {
     }
 
     // 5. Create order and decrement inventory in a single transaction
-    return OrderRepository.createOrderWithInventoryUpdate(storeId, orderData, validatedItemsData);
+    // Snapshot customer info into the order
+    const enhancedOrderData = {
+      ...orderData,
+      customerId: customer.id,
+      customerName: `${customer.firstName} ${customer.lastName}`.trim(),
+      customerEmail: customer.email,
+      customerPhone: customer.phone,
+    };
+
+    return OrderRepository.createOrderWithInventoryUpdate(storeId, enhancedOrderData, validatedItemsData);
   }
 
   /**
-   * Tracks guest orders by email and phone for a specific store.
+   * Lists orders for an authenticated customer.
    */
-  async trackOrders(storeId, email, phone) {
-    return OrderRepository.trackOrders(storeId, email, phone);
+  async getCustomerOrders(storeId, customerId) {
+    return OrderRepository.findCustomerOrders(storeId, customerId);
+  }
+
+  /**
+   * Gets specific order details for a customer.
+   */
+  async getCustomerOrderDetails(storeId, customerId, orderId) {
+    const order = await OrderRepository.getOrderByIdAndStore(orderId, storeId);
+    if (!order) {
+      throw new NotFoundError('Order not found');
+    }
+    if (order.customerId !== customerId) {
+      throw new NotFoundError('Order not found');
+    }
+    return order;
   }
 
   /**

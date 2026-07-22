@@ -51,6 +51,7 @@ class OrderRepository {
         data: {
           orderNumber,
           storeId,
+          customerId: orderData.customerId,
           customerName: orderData.customerName,
           customerEmail: orderData.customerEmail,
           customerPhone: orderData.customerPhone,
@@ -85,14 +86,13 @@ class OrderRepository {
   }
 
   /**
-   * Tracks orders for a specific store by email and phone.
+   * Finds orders for a specific customer in a store.
    */
-  async trackOrders(storeId, email, phone) {
+  async findCustomerOrders(storeId, customerId) {
     return prisma.order.findMany({
       where: {
         storeId,
-        customerEmail: email,
-        customerPhone: phone,
+        customerId,
       },
       include: {
         items: true,
