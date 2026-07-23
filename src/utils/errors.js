@@ -58,7 +58,6 @@ class ConflictError extends AppError {
 }
 
 module.exports = {
-  AppError,
   BadRequestError,
   UnauthorizedError,
   ForbiddenError,
